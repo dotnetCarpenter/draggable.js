@@ -87,9 +87,10 @@
   }
 
   function getInitialPosition(element) {
-    var top = 0;
-    var left = 0;
-    var currentElement = element;
+    var top = 0,
+        left = 0,
+        currentElement = element,
+        boundingClientRect = element.getBoundingClientRect;
     do {
       top += currentElement.offsetTop;
       left += currentElement.offsetLeft;
