@@ -99,7 +99,6 @@
     if (computedStyle) {
       left = left - (parseInt(computedStyle['margin-left']) || 0) - (parseInt(computedStyle['border-left']) || 0);
       top = top - (parseInt(computedStyle['margin-top']) || 0) - (parseInt(computedStyle['border-top']) || 0);
->>>>>>> master
     }
 
     return {
