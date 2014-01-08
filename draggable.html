@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Draggable test</title>
+  <style>
+    .drag {
+      width: 10rem;
+      height: 10rem;
+      background-color: lightgreen;
+    }
+    section {
+      left: 1rem;
+      top: 5rem;
+    }
+    .absolute {
+      position: absolute;
+    }
+    .other {
+      top: -1rem;
+      left: 2rem;
+    }
+  </style>
+</head>
+<body>
+  
+  <section>
+    <div class="drag">content</div>
+  </section>
+  
+  <section class="absolute" style="left:300px">
+    <div class="drag">absolute content</div>
+  </section>
+  <!--
+  <section class="absolute">
+    <div class="absolute other">
+      <div class="drag">content</div>
+    </div>
+  </section>
+  
+  <svg class="drag absolute" style="margin: 50px 400px;"><text height="30" y="20">svg content</text></svg>
+  -->
+  <svg style="background-color:red;margin-top:200px;" viewbox="0 0 500 300" height="300px" width="500px">
+    <circle class="drag" cx="60" cy="60" r="50"></circle>
+  </svg>
+
+
+  <script src="draggable.js"></script>
+  <script>
+    var draggables = document.querySelectorAll('.drag');
+    for(var i = 0, len = draggables.length; i < len; draggable(draggables[i]), i++);
+  </script>
+</body>
+</html>
