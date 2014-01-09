@@ -28,11 +28,39 @@
     return transformOrigin = 'transform-origin:' + inPixels(x) + ' ' + inPixels(y) + ';';
   };
 
+  function log() {
+    var args = Array.prototype.slice.call(arguments, 0);
+    console.log(args);
+    //args.forEach(function(msg) { console.log(msg); });
+  }
+
+  function logPos(axes, original, mousepos, newpos, diff, mouseoffset) {
+    var text = [
+      "original " + axes + " position",
+      "mouse position " + axes,
+      "current " + axes + " position",
+      "diff: ",
+      "moouse pointer inside box offset"
+    ];
+    log(
+      text[0], original,
+      text[1], mousepos,
+      text[2], newpos,
+      text[3], diff,
+      text[4], mouseoffset || "n/a"
+    )
+  }
+
   function draggable(element, handle) {
-    //var rect = getInitialPosition(element);
     handle = handle || element;
-    setPositionType(element); 
-    setDraggableListeners(element);    
+
+    var rect = getInitialPosition(element);
+    setPositionType(element);
+    element.startXPosition = rect.x;
+    element.startYPosition = rect.y;    
+    //doMove({ clientX: rect.x, clientY: rect.y }, element);
+
+    setDraggableListeners(element);
     handle.addEventListener('mousedown', function(event) {
       startDragging(event, element);
     });
@@ -40,79 +68,82 @@
 
   function doMove(event, element) {
     var svg = element instanceof SVGElement && !!element.ownerSVGElement;
-    var moveX = (event.clientX - currentElement.startXPosition);
-    var moveY = (event.clientY - currentElement.startYPosition);
+    var rect = getInitialPosition(element);
+    var moveX = (element.offsetX - event.clientX) * -1;
+    var moveY = (element.offsetY - event.clientY) * -1;
+    
+    // var offsetX = moveX - rect.x;
+    // var offsetY = moveY - rect.y;
     var translate = getTranslateCSS(
       moveX,
       moveY,
       svg
     );
 
-// console.log( event.clientX, event.clientX, rectStruct.x, rectStruct.x, (event.clientX-event.clientX - rect.x-rect.x) )
-// console.log( event.clientY, event.clientY, rectStruct.y, rectStruct.y, (event.clientY - event.clientY - rect.y-rect.y) )
 
-// console.log( event.clientX - event.clientX - rectStruct.x - rectStruct.x )
-// console.log( event.clientY - event.clientY - rectStruct.y - rectStruct.y )
-
-// console.log( rectStruct.x )
-// console.log( rectStruct.y )
-// console.log("lastXPosition", currentElement.startXPosition )
-// console.log("startYPosition", currentElement.startYPosition )
-
-console.log(
-  "old X position", currentElement.startXPosition,
-  "new X position", event.clientX,
-  "forskel", moveX
+logPos("X",
+  element.startXPosition,
+  event.clientX,
+  moveX,
+  moveX - element.startXPosition - element.startXPosition * -1,
+  event.offsetX
 )
-console.log("old Y position", currentElement.startYPosition,
-  "new Y position", event.clientY,
-  "forskel", moveY
+logPos("Y",
+  element.startYPosition,
+  event.clientY,
+  moveY,
+  moveY - element.startYPosition - element.startYPosition * -1,
+  event.offsetY
 )
     if(svg) {
       element.setAttribute('transform', translate);
     } else {
-//console.log( 'transform:' + translate + ';' + transformOrigin );
-
+log( 'transform:' + translate + ';' + transformOrigin );
       element.style.WebkitTransform = translate;
+      element.style.MozTransform = translate;
     }
   }
 
   function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
-  function parse(regex) {
-    return function(string) {
-      return string.match(regex);
-    }
-  }
+  // function parse(regex) {
+  //   return function(string) {
+  //     return string.match(regex);
+  //   }
+  // }
 
   function startDragging(event, element) {
     currentElement && sendToBack(currentElement);
     currentElement = bringToFront(element);
-    //var rect = getInitialPosition(element);
-    var getTranslateValues = parse(/translate(\d+)\,(\d+)/);
-    console.log(currentElement.style.cssText);
-    console.dir(getTranslateValues(currentElement.style.cssText));
-    var currentX = isNumber(currentElement.startXPosition) && currentElement.startXPosition || event.clientX// + (currentElement.startXPosition || 0);
-    var currentY = isNumber(currentElement.startYPosition) && currentElement.startYPosition || event.clientY// + (currentElement.startYPosition || 0);
-    // if(!currentElement.startXPosition) {
-    //   currentElement.startXPosition = rect.x//event.clientX - rect.x;
-    //   currentElement.startYPosition = rect.y//event.clientY - rect.y;
-    // } else {
-      // console.log(
-      //   "old X position", currentX,
-      //   "new X position", currentX + event.clientX - currentX,
-      //   "forskel", event.clientX - currentX
-      // )
-      // console.log("old Y position", currentY,
-      //   "new Y position", currentY + event.clientY - currentY,
-      //   "forskel", event.clientY - currentY
-      // )
-      currentElement.startXPosition = currentX//currentX + event.clientX - currentX// - rect.x;
-      currentElement.startYPosition = currentY//currentY + event.clientY - currentY// - rect.y;
-    //}
+    // //var rect = getInitialPosition(element);
+    // var getTranslateValues = parse(/translate(\d+)\,(\d+)/);
+    // console.log(currentElement.style.cssText);
+    // console.dir(getTranslateValues(currentElement.style.cssText));
+    // var rect = element.getAttribute('data-draggable-initial');
+    //var currentX = isNumber(currentElement.startXPosition) && (currentElement.startXPosition) ||*/ event.clientX// + (currentElement.startXPosition || 0);
+    //var currentY = isNumber(currentElement.startYPosition) && (currentElement.startYPosition) ||*/ event.clientY// + (currentElement.startYPosition || 0);
+
+    if(element.offsetX === undefined) {
+      element.offsetX = event.clientX;
+      element.offsetY = event.clientY;
+    }
     //setTransformOrigin(event.clientX - rectStruct.x, event.clientY - rectStruct.y);
-    
+logPos("X",
+  element.startXPosition,
+  event.clientX,
+  currentElement.startXPosition - event.clientX,
+  event.clientX - currentElement.startXPosition - element.startXPosition,
+  event.offsetX
+)
+logPos("Y",
+  element.startYPosition,
+  event.clientY,
+  currentElement.startYPosition - event.clientY,
+  event.clientY - currentElement.startYPosition - element.startYPosition,
+  event.offsetY
+)
+
     doMove(event, element);
 
     var okToGoOn = triggerEvent('start', new DraggableEvent(event.clientX, event.clientY, event));
@@ -123,7 +154,6 @@ console.log("old Y position", currentElement.startYPosition,
 
   function getInitialPosition(element) {
     var boundingClientRect = element.getBoundingClientRect();
-    //while()
     return {
       x: boundingClientRect.left,
       y: boundingClientRect.top
@@ -205,7 +235,7 @@ console.log("old Y position", currentElement.startYPosition,
   function cancelDocumentSelection(event) {
     event.preventDefault && event.preventDefault();
     event.stopPropagation && event.stopPropagation();
-    !event.preventDefault && (event.returnValue = false);
+    !event.preventDefault && (event.returnValue = false); // returnValue is deprecated
     return false;
   }
 
@@ -213,14 +243,17 @@ console.log("old Y position", currentElement.startYPosition,
     document.removeEventListener('selectstart', cancelDocumentSelection);
     document.removeEventListener('mousemove', repositionElement);
     document.removeEventListener('mouseup', removeDocumentListeners);
+    var element = currentElement;
+    element.offsetX = (element.offsetX - event.clientX) * -1;
+    element.offsetY = (element.offsetY - event.clientY) * -1;
 
 // console.log("old X position", currentElement.startXPosition, "new X position",  event.clientX - currentElement.startXPosition)
 // console.log("old Y position", currentElement.startYPosition, "new Y position", event.clientY - currentElement.startYPosition)
      //currentElement.startXPosition = event.clientX + event.clientX - currentElement.startXPosition// - currentElement.startXPosition // - rect.x;
      //currentElement.startYPosition = event.clientY + event.clientY - currentElement.startXPosition// - currentElement.startYPosition// - rect.y;
 
-    currentElement.startXPosition = (event.clientX - currentElement.startXPosition);
-    currentElement.startYPosition = (event.clientY - currentElement.startYPosition);
+    // currentElement.startXPosition = (event.clientX - currentElement.startXPosition);
+    // currentElement.startYPosition = (event.clientY - currentElement.startYPosition);
     
     //FIXME: don't use style
     var left = parseInt(currentElement.style.left, 10);

@@ -48,7 +48,15 @@
   <script src="draggable.js"></script>
   <script>
     var draggables = document.querySelectorAll('.drag');
-    for(var i = 0, len = draggables.length; i < len; draggable(draggables[i]), i++);
+    for(var i = 0, len = draggables.length; i < len; setup(draggables[i]), i++);
+
+    function setup(element) {
+      element.addEventListener("start", function() { console.dir(arguments); })
+      draggable(element);
+      // element.whenDragStarts(function() {
+      //   console.dir(arguments);
+      // });
+    }
   </script>
 </body>
 </html>
